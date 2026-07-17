@@ -9,7 +9,7 @@ interface RequestStatusProps {
   className?: string;
 }
 
-const statusConfig: Record
+const statusConfig: Record<
   RequestStatusValue,
   {
     label: string;

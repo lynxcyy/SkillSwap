@@ -62,8 +62,10 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     try {
-      // integrate with Supabase Auth sign-in
+      // Simulate backend delay
       await new Promise((resolve) => setTimeout(resolve, 600));
+      // Save simulated login state
+      localStorage.setItem("isLoggedIn", "true");
       router.push("/dashboard");
     } finally {
       setIsSubmitting(false);
@@ -116,7 +118,7 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="login-password">Password</Label>
                   <Link
-                    href="/forgot-password"
+                    href="#"
                     className="text-2xs font-medium text-primary hover:underline"
                   >
                     Lupa Password?

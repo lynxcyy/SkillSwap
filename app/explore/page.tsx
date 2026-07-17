@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import { Star, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { MobileDrawer } from "@/components/dashboard/MobileDrawer";
 import { TopNavbar } from "@/components/dashboard/TopNavbar";
 import { BottomNavigation } from "@/components/dashboard/BottomNavigation";
-import { SearchBar } from "@/components/explore/SearchBar";
-import { CategoryFilter, type CategoryFilterOption } from "@/components/explore/CategoryFilter";
+import { SearchBar } from "@/components/dashboard/SearchBar";
+import { CategoryFilter, type Category } from "@/components/dashboard/CategoryFilter";
+import { MentorCard } from "@/components/dashboard/MentorCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,13 +24,13 @@ interface Mentor {
   department: string;
   avatarUrl?: string;
   skillName: string;
+  skillId: string;
   categoryId: string;
   level: SkillLevel;
   rating: number;
 }
 
-const categories: CategoryFilterOption[] = [
-  { id: "all", name: "Semua" },
+const categories: Category[] = [
   { id: "cat-teknologi", name: "Teknologi", iconEmoji: "💻" },
   { id: "cat-desain", name: "Desain", iconEmoji: "🎨" },
   { id: "cat-bahasa", name: "Bahasa", iconEmoji: "🌍" },
@@ -44,6 +46,7 @@ const mentors: Mentor[] = [
     name: "Dimas Pratama",
     department: "Teknik Informatika",
     skillName: "React.js",
+    skillId: "skill-1",
     categoryId: "cat-teknologi",
     level: "advanced",
     rating: 4.8,
@@ -53,6 +56,7 @@ const mentors: Mentor[] = [
     name: "Rina Kusuma",
     department: "Desain Komunikasi Visual",
     skillName: "UI/UX Design",
+    skillId: "skill-2",
     categoryId: "cat-desain",
     level: "intermediate",
     rating: 4.6,
@@ -62,6 +66,7 @@ const mentors: Mentor[] = [
     name: "Sari Dewi",
     department: "Sastra Inggris",
     skillName: "Conversational English",
+    skillId: "skill-3",
     categoryId: "cat-bahasa",
     level: "advanced",
     rating: 4.9,
@@ -71,6 +76,7 @@ const mentors: Mentor[] = [
     name: "Bayu Aditya",
     department: "Manajemen",
     skillName: "Public Speaking",
+    skillId: "skill-4",
     categoryId: "cat-bisnis",
     level: "beginner",
     rating: 4.2,
@@ -80,6 +86,7 @@ const mentors: Mentor[] = [
     name: "Putri Amalia",
     department: "Seni Musik",
     skillName: "Gitar Akustik",
+    skillId: "skill-5",
     categoryId: "cat-seni",
     level: "intermediate",
     rating: 4.7,
@@ -89,113 +96,26 @@ const mentors: Mentor[] = [
     name: "Fajar Nugroho",
     department: "Fisika",
     skillName: "Kalkulus Dasar",
+    skillId: "skill-6",
     categoryId: "cat-akademik",
     level: "advanced",
     rating: 4.5,
   },
 ];
 
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
 
-function getAvatarColorClass(name: string) {
-  const tints = [
-    "bg-accent text-accent-foreground",
-    "bg-warning/15 text-warning",
-    "bg-success/15 text-success",
-    "bg-destructive/15 text-destructive",
-  ];
-  const index = (name.charCodeAt(0) || 0) % tints.length;
-  return tints[index];
-}
-
-function levelBadgeVariant(level: SkillLevel) {
-  if (level === "beginner") return "success" as const;
-  if (level === "intermediate") return "warning" as const;
-  return "default" as const;
-}
-
-function levelLabel(level: SkillLevel) {
-  if (level === "beginner") return "Beginner";
-  if (level === "intermediate") return "Intermediate";
-  return "Advanced";
-}
-
-function MentorCard({ mentor }: { mentor: Mentor }) {
-  return (
-    <Card className="shadow-card">
-      <CardHeader className="flex flex-row items-start gap-3 p-5">
-        <Avatar className="h-11 w-11 shrink-0">
-          <AvatarImage src={mentor.avatarUrl} alt={mentor.name} />
-          <AvatarFallback className={getAvatarColorClass(mentor.name)}>
-            {getInitials(mentor.name)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-md font-semibold text-foreground">
-            {mentor.name}
-          </p>
-          <p className="truncate text-xs text-muted-foreground">
-            {mentor.department}
-          </p>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-2 p-5 pt-0">
-        <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm font-medium text-foreground">
-            {mentor.skillName}
-          </p>
-          <Badge variant={levelBadgeVariant(mentor.level)}>
-            {levelLabel(mentor.level)}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-0.5">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={cn(
-                  "h-3.5 w-3.5",
-                  star <= Math.round(mentor.rating)
-                    ? "fill-star text-star"
-                    : "text-border"
-                )}
-              />
-            ))}
-          </div>
-          <span className="text-xs font-medium text-foreground">
-            {mentor.rating.toFixed(1)}
-          </span>
-        </div>
-      </CardContent>
-
-      <CardFooter className="p-5">
-        <Button type="button" className="w-full">
-          Kirim Request
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-}
 
 export default function ExplorePage() {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const filteredMentors = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     return mentors.filter((mentor) => {
       const matchesCategory =
-        activeCategory === "all" || mentor.categoryId === activeCategory;
+        activeCategory === null || mentor.categoryId === activeCategory;
       const matchesQuery =
         query.length === 0 ||
         mentor.name.toLowerCase().includes(query) ||
@@ -207,6 +127,9 @@ export default function ExplorePage() {
   return (
     <div className="flex h-screen">
       <Sidebar />
+      {isDrawerOpen && (
+        <MobileDrawer onClose={() => setIsDrawerOpen(false)} />
+      )}
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopNavbar onMenuClick={() => setIsDrawerOpen(true)} searchPlaceholder="Search mentor..." />
         <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">

@@ -1,6 +1,7 @@
 // app/settings/page.tsx
 "use client";
 
+import type { ElementType } from "react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import {
@@ -12,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { MobileDrawer } from "@/components/dashboard/MobileDrawer";
 import { TopNavbar } from "@/components/dashboard/TopNavbar";
 import { BottomNavigation } from "@/components/dashboard/BottomNavigation";
 import { cn } from "@/lib/utils";
@@ -38,7 +40,7 @@ type SettingsSection = "profile" | "account" | "notifications" | "privacy" | "da
 interface SectionNavItem {
   id: SettingsSection;
   label: string;
-  icon: React.ElementType;
+  icon: ElementType;
 }
 
 const sectionNavItems: SectionNavItem[] = [
@@ -107,28 +109,7 @@ export default function SettingsPage() {
     <div className="flex h-screen">
       <Sidebar />
       {isDrawerOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-foreground/40"
-            onClick={() => setIsDrawerOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="relative flex h-full w-60 flex-col bg-card">
-            <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <span className="text-md font-semibold text-foreground">
-                SkillSwap
-              </span>
-              <button
-                type="button"
-                onClick={() => setIsDrawerOpen(false)}
-                aria-label="Close menu"
-                className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <MobileDrawer onClose={() => setIsDrawerOpen(false)} />
       )}
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopNavbar onMenuClick={() => setIsDrawerOpen(true)} searchPlaceholder="Search settings..." />

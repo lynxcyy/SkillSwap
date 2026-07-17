@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Inbox } from "lucide-react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { MobileDrawer } from "@/components/dashboard/MobileDrawer";
 import { TopNavbar } from "@/components/dashboard/TopNavbar";
 import { BottomNavigation } from "@/components/dashboard/BottomNavigation";
 import { Card, CardContent } from "@/components/ui/card";
@@ -107,6 +108,9 @@ export default function RequestPage() {
   return (
     <div className="flex h-screen">
       <Sidebar />
+      {isDrawerOpen && (
+        <MobileDrawer onClose={() => setIsDrawerOpen(false)} />
+      )}
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopNavbar onMenuClick={() => setIsDrawerOpen(true)} searchPlaceholder="Search learning requests..." />
         <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">

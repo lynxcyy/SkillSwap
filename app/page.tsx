@@ -1,3 +1,4 @@
+import type { ElementType } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -14,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { siteConfig } from "@/config/site";
 
 interface FeatureItem {
-  icon: React.ElementType;
+  icon: ElementType;
   title: string;
   description: string;
 }

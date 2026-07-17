@@ -59,7 +59,7 @@ export function MentorCard({ mentor }: MentorCardProps) {
   return (
     <Card className="shadow-card">
       <Link
-        href={`/profile/${mentor.id}`}
+        href="#"
         className="block"
         aria-label={`Lihat profil ${mentor.name}`}
       >
@@ -110,7 +110,7 @@ export function MentorCard({ mentor }: MentorCardProps) {
       </Link>
       <CardFooter className="p-5">
         <Button asChild className="w-full">
-          <Link href={`/requests/new?skillId=${mentor.skillId}`}>
+          <Link href="/requests">
             Kirim Request
           </Link>
         </Button>

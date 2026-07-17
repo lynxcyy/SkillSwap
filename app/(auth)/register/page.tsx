@@ -290,11 +290,11 @@ export default function RegisterPage() {
                   />
                   <span>
                     Saya menyetujui{" "}
-                    <Link href="/terms" className="text-primary hover:underline">
+                    <Link href="#" className="text-primary hover:underline">
                       Syarat & Ketentuan
                     </Link>{" "}
                     serta{" "}
-                    <Link href="/privacy" className="text-primary hover:underline">
+                    <Link href="#" className="text-primary hover:underline">
                       Kebijakan Privasi
                     </Link>
                   </span>
