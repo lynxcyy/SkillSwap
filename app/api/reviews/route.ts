@@ -1,27 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// GET /api/reviews?mentorId=xxx
+// GET /api/reviews?requestId=xxx
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const mentorId = searchParams.get("mentorId");
+    const requestId = searchParams.get("requestId");
 
     const supabase = await createClient();
 
     let query = supabase
       .from("reviews")
-      .select(`
-        id,
-        rating,
-        comment,
-        created_at,
-        reviewer:profiles!reviews_reviewer_id_fkey ( id, name, avatar_url ),
-        mentor:profiles!reviews_mentor_id_fkey ( id, name )
-      `)
+      .select("id, rating, review, created_at, request_id")
       .order("created_at", { ascending: false });
 
-    if (mentorId) query = query.eq("mentor_id", mentorId);
+    if (requestId) query = query.eq("request_id", requestId);
 
     const { data, error } = await query;
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -32,7 +25,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/reviews — submit review setelah sesi selesai
+// POST /api/reviews
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -42,27 +35,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
     }
 
-    const { requestId, mentorId, rating, comment } = await request.json();
+    const { requestId, rating, review } = await request.json();
 
-    if (!requestId || !mentorId || !rating) {
-      return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 });
+    if (!requestId || !rating) {
+      return NextResponse.json({ error: "requestId dan rating wajib diisi" }, { status: 400 });
     }
-
     if (rating < 1 || rating > 5) {
       return NextResponse.json({ error: "Rating harus antara 1-5" }, { status: 400 });
     }
 
-    // Pastikan request ini statusnya "completed" dan milik user ini
+    // Pastikan request statusnya completed dan user adalah sender
     const { data: req } = await supabase
-      .from("learning_requests")
-      .select("status, learner_id")
+      .from("requests")
+      .select("status, sender_id")
       .eq("id", requestId)
       .single();
 
-    if (!req) {
-      return NextResponse.json({ error: "Request tidak ditemukan" }, { status: 404 });
-    }
-    if (req.learner_id !== user.id) {
+    if (!req) return NextResponse.json({ error: "Request tidak ditemukan" }, { status: 404 });
+    if (req.sender_id !== user.id) {
       return NextResponse.json({ error: "Hanya learner yang bisa memberi review" }, { status: 403 });
     }
     if (req.status !== "completed") {
@@ -71,13 +61,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase
       .from("reviews")
-      .insert({
-        request_id: requestId,
-        reviewer_id: user.id,
-        mentor_id: mentorId,
-        rating,
-        comment: comment ?? null,
-      })
+      .insert({ request_id: requestId, rating, review: review ?? null })
       .select()
       .single();
 

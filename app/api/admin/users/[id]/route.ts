@@ -7,17 +7,16 @@ async function requireAdmin() {
   if (error || !user) return { supabase: null, error: "Tidak terautentikasi" };
 
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("users")
     .select("role")
     .eq("id", user.id)
     .single();
 
   if (profile?.role !== "admin") return { supabase: null, error: "Akses ditolak" };
-
   return { supabase, error: null };
 }
 
-// PATCH /api/admin/users/[id] — update role user
+// PATCH /api/admin/users/[id]
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -29,28 +28,27 @@ export async function PATCH(
 
   try {
     const { id } = await params;
-    const { role } = await request.json();
+    const body = await request.json();
 
-    if (!["admin", "user"].includes(role)) {
-      return NextResponse.json({ error: "Role tidak valid" }, { status: 400 });
-    }
+    const updates: Record<string, string> = {};
+    if (body.role && ["admin", "user"].includes(body.role)) updates.role = body.role;
+    if (body.name) updates.name = body.name;
 
     const { data, error: dbError } = await supabase
-      .from("profiles")
-      .update({ role })
+      .from("users")
+      .update(updates)
       .eq("id", id)
       .select()
       .single();
 
     if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
-
     return NextResponse.json({ user: data });
   } catch {
     return NextResponse.json({ error: "Terjadi kesalahan server" }, { status: 500 });
   }
 }
 
-// DELETE /api/admin/users/[id] — hapus user
+// DELETE /api/admin/users/[id]
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -62,14 +60,8 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-
-    const { error: dbError } = await supabase
-      .from("profiles")
-      .delete()
-      .eq("id", id);
-
+    const { error: dbError } = await supabase.from("users").delete().eq("id", id);
     if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
-
     return NextResponse.json({ message: "User berhasil dihapus" });
   } catch {
     return NextResponse.json({ error: "Terjadi kesalahan server" }, { status: 500 });

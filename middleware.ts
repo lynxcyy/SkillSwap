@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
   if (user && (pathname === "/login" || pathname === "/register")) {
     // Ambil role dari profile
     const { data: profile } = await supabase
-      .from("profiles")
+      .from("users")
       .select("role")
       .eq("id", user.id)
       .single();
@@ -80,7 +80,7 @@ export async function middleware(request: NextRequest) {
   // Cek akses /admin — hanya untuk role admin
   if (user && pathname.startsWith("/admin")) {
     const { data: profile } = await supabase
-      .from("profiles")
+      .from("users")
       .select("role")
       .eq("id", user.id)
       .single();

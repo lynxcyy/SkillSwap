@@ -34,8 +34,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
+    const needsEmailVerification = data.user && data.session === null;
+
     return NextResponse.json(
-      { message: "Registrasi berhasil", user: data.user },
+      { message: "Registrasi berhasil", user: data.user, needsEmailVerification },
       { status: 201 }
     );
   } catch {

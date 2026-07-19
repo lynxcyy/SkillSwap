@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// Middleware: pastikan hanya admin yang bisa akses
 async function requireAdmin() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) return { supabase: null, error: "Tidak terautentikasi" };
 
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("users")
     .select("role")
     .eq("id", user.id)
     .single();
 
   if (profile?.role !== "admin") return { supabase: null, error: "Akses ditolak" };
-
   return { supabase, error: null };
 }
 
@@ -30,8 +28,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
 
     let query = supabase
-      .from("profiles")
-      .select("id, name, email, role, department, created_at")
+      .from("users")
+      .select("id, name, email, role, created_at")
       .order("created_at", { ascending: false });
 
     if (search) query = query.ilike("name", `%${search}%`);

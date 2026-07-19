@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// GET /api/users/[id] — profil user tertentu
+// GET /api/users/[id]
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -11,22 +11,12 @@ export async function GET(
     const supabase = await createClient();
 
     const { data: profile, error } = await supabase
-      .from("profiles")
+      .from("users")
       .select(`
-        id,
-        name,
-        email,
-        role,
-        department,
-        avatar_url,
-        bio,
-        created_at,
+        id, name, email, role, bio, avatar, created_at,
         skills (
-          id,
-          name,
-          level,
-          description,
-          categories ( id, name, icon_emoji )
+          id, title, level, description,
+          categories ( id, name, icon )
         )
       `)
       .eq("id", id)
@@ -42,7 +32,7 @@ export async function GET(
   }
 }
 
-// PATCH /api/users/[id] — update profil sendiri
+// PATCH /api/users/[id]
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -60,16 +50,14 @@ export async function PATCH(
       return NextResponse.json({ error: "Tidak diizinkan mengubah profil orang lain" }, { status: 403 });
     }
 
-    const { name, department, bio, avatarUrl } = await request.json();
-
-    const updates: Record<string, string> = { updated_at: new Date().toISOString() };
+    const { name, bio, avatar } = await request.json();
+    const updates: Record<string, string> = {};
     if (name !== undefined) updates.name = name;
-    if (department !== undefined) updates.department = department;
     if (bio !== undefined) updates.bio = bio;
-    if (avatarUrl !== undefined) updates.avatar_url = avatarUrl;
+    if (avatar !== undefined) updates.avatar = avatar;
 
     const { data, error } = await supabase
-      .from("profiles")
+      .from("users")
       .update(updates)
       .eq("id", id)
       .select()
